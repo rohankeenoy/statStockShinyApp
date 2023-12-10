@@ -1,0 +1,22 @@
+A published app can be found at here:
+https://igk66z-rohan-keenoy.shinyapps.io/StatStock/
+
+PUBLISHED APPLICATIONS:
+There are a few issues with the published app:
+*****PLEASE MAKE SURE WEB SCRAPPING IS COMPLETE BEFORE EXPLORING THE ML TAB*********
+the main one being that the linear regression model (with the working rsquared values) does not display occasionally. However, locally it always displays. To view these you may load on your local machine.
+R-markdown handles shiny apps weird, so I upload this to my github on 12/10/2023:
+
+
+
+FINE TUNING/ISSUES/Thoughts:
+Additioinally, I ran out of time on testing and adding features mainly
+-I like the theme, not really readable. Would like to mess with colors more.
+-taking logs of the data for closer data visualization
+-adding basic statistics for the stats page (would like to add summary statistics and a couple more general stats)
+-finer tuning of the models and adding selection of variables (I would rather other variables besides a lagged variable to predict short term values. I would also like to incoporate better error statistics and graphs)
+- There is a memory bottleneck when scraping data where it limits the amount of securities and time frame. Optimization can be achieved but storing the data in a server(expensive for college student) or using a data frame seperate for each stock (requires modifying a lot of code). Currently, it throws each stock in a list, which can be memory intensive. 
+
+
+To Run locally:
+Open In RStudio as a .R file and click "Run App". The R Studio popout window will not render html correctly, but opening in web browser will. 
