@@ -12,7 +12,7 @@ library(rpart)
 library(gbm)
 
 
-# Turn on thematic for theme-matched plots
+#themeing 
 thematic::thematic_shiny(font = "auto")
 theme_set(theme_bw(base_size = 16))
 
@@ -158,7 +158,8 @@ server = function(input, output, session){
     paste("Scraping status: ", scrapedDataValues$scrapingStatus)
   })
   
-  # Linear Regression Plot Function
+  #Linear Regression Plot Function but used for other models i added last minute
+  # 3 is better than 1 :P
   output$lmPlot = renderPlot({
     
     algType = as.character(mLType())
@@ -175,13 +176,13 @@ server = function(input, output, session){
            )
     
     
-    # Combine results for all stocks into a single data frame
+    #Combine results for all stocks into a single data frame
     data = do.call(rbind, lapply(lm_results_data, function(x) x$predictions))
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+    #Check if scrapedData is not empty
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+      #Bind all the dataframes by row, making one long dataframe
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
@@ -207,20 +208,18 @@ server = function(input, output, session){
     )
     
     
-    # Check if results is a list
+    #Check if results is a list
     if (is.list(results)) {
       
-      # Loop over results for each stock
+      # Loop results for each stock
       for (stock_result in results) {
         stockName = unique(stock_result$predictions$Stock)
         print(stockName)
-        # Extract model name
+        
         model_name = stock_result$model$coefficients
         
-        # Extract R-squared value
-        rsquared = stock_result$rsquared
         
-        # Print model name and R-squared value for the current stock
+        rsquared = stock_result$rsquared
         cat("Coeffiencts for", stockName, ":", model_name, "\n")
         cat("R-squared for", stockName, ":", rsquared, "\n\n")
       }
@@ -234,18 +233,18 @@ server = function(input, output, session){
   output$correlationText = renderPrint({
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+    #Check if scrapedData is not empty
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+      #Binds all the dataframes by row, making one long dataframe
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
       
-      # Add the code for plotting here
+      
       correlationMatrix = createTable(df)
       
       
-      # Return the correlation matrix for verbatimTextOutput
+      
       return(correlationMatrix)
     }
   })
@@ -266,9 +265,9 @@ server = function(input, output, session){
   output$plot1 = renderPlot({
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+  
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+      #Binds all the dataframes by row, making one long dataframe
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
@@ -284,14 +283,14 @@ server = function(input, output, session){
   output$plot2 = renderPlot({
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+    #Check if scrapedData is not empty
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+      
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
       correlationMatrix = createTable(df)
-      # Add the code for plotting here
+  
       createTable(df)
     }
   })
@@ -299,14 +298,14 @@ server = function(input, output, session){
   output$plot3 = renderPlot({
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+   
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+     e
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
       
-      # Add the code for plotting here
+      
       graph(df, as.character(vaR()))
     }
   })
@@ -314,14 +313,13 @@ server = function(input, output, session){
   output$plot4 = renderPlot({
     scrapedData = scrapedDataValues$scrapedData
     
-    # Check if scrapedData is not empty
+    
     if (!is.null(scrapedData)) {
-      # Binds all the dataframes by row, making one long dataframe
+      #Binds all the dataframes by row, making one long dataframe
       df = bind_rows(scrapedData, .id = "Stock")
       df = as.data.frame(df)
       df = cleanData(df)
       
-      # Add the code for plotting here
       histogram(df,as.character(vaR()))
       
     }
@@ -423,11 +421,11 @@ graph = function(df, y) {
 
 #Tree map diagram histogram = function(df){
 treeMap = function(df, y) {
-  # Find the minimum and maximum dates
+  #Find the minimum and maximum dates
   minDate = min(df$Date)
   maxDate = max(df$Date)
   
-  # Calculate the change in y values and the percentage change
+  #Calculate the change in y values and the percentage change
   df = df %>%
     group_by(Stock) %>%
     summarize(yChange = (max(!!sym(y)) - min(!!sym(y))),
@@ -507,18 +505,18 @@ lm_results = reactive({
     df$Close_lag = lag(df$`Close*`)
     
   
-    # Remove NA values introduced by lag
+    #Remove NA values introduced by lag
     df = na.omit(df)
     
-    # Initialize a list to store results for each stock
+    #Initialize a list to store results for each stock
     results_list = list()
     
-    # Loop over unique stocks
+    #Loop over unique stocks
     for (stock in unique(df$Stock)) {
       # Subset data for the current stock
       stock_data = df[df$Stock == stock, ]
       
-      # Predict days in advance:
+      #Predict days in advance:
       predictedData = data.frame(
         Date = seq(max(stock_data$Date) + 1, by = 1, length.out = daysToAdd),
         Stock = rep(stock, daysToAdd),
@@ -536,10 +534,9 @@ lm_results = reactive({
         Predicted = predictions
       )
       print(summary(lm_model))
-      #Calculate R-squared
+      
       rsquared = summary(lm_model)$r.squared
       
-      #Store results for the current stock
       results_list[[stock]] = list(model = lm_model, predictions = results_df, rsquared = rsquared)
       
     }
@@ -564,10 +561,10 @@ forestResults = reactive({
     df = na.omit(df)
     results_list = list()
     for (stock in unique(df$Stock)) {
-      # Subset data for the current stock
+      
       stock_data = df[df$Stock == stock, ]
       
-      # Predict days in advance:
+      
       predictedData = data.frame(
         Date = seq(max(stock_data$Date) + 1, by = 1, length.out = daysToAdd),
         Stock = rep(stock, daysToAdd),
@@ -587,10 +584,9 @@ forestResults = reactive({
         Predicted = predictions
       )
       
-      # Calculate R-squared
+     
       rsquared = summary(lm_model)$r.squared
       print(summary(lm_model))
-      # Store results for the current stock
       results_list[[stock]] = list(model = lm_model, predictions = results_df, rsquared = rsquared)
       
     }
@@ -612,14 +608,14 @@ rForestResults = reactive({
     df$Close_lag = lag(df$`Close*`)
     
     print("In that gbm yo")
-    # Remove NA values introduced by lag
+    #Remove NA values introduced by lag
     df = na.omit(df)
     results_list = list()
     for (stock in unique(df$Stock)) {
-      # Subset data for the current stock
+      #Subset data for the current stock
       stock_data = df[df$Stock == stock, ]
       
-      # Predict days in advance:
+      
       predictedData = data.frame(
         Date = seq(max(stock_data$Date) + 1, by = 1, length.out = daysToAdd),
         Stock = rep(stock, daysToAdd),
@@ -633,17 +629,17 @@ rForestResults = reactive({
       # Predictions
       predictions = predict(lm_model, newdata = predictedData)
       
-      # Combine original data with predictions, date, stock, and value
+      #Combine original data with predictions, date, stock, and value
       results_df = data.frame(
         Date = predictedData$Date,
         Stock = predictedData$Stock,
         Predicted = predictions
       )
       
-      # Calculate R-squared
+      
       rsquared = summary(lm_model)$r.squared
       print(summary(lm_model))
-      # Store results for the current stock
+      
       results_list[[stock]] = list(model = lm_model, predictions = results_df, rsquared = rsquared)
       
     }
@@ -656,11 +652,11 @@ rForestResults = reactive({
 createTable = function(df) {
   stockNames= unique(df$Stock)
   
-  # Reshape the data using spread, brings the rows to the columns by stock and Close values
+  #Reshape the data using spread, brings the rows to the columns by stock and Close values
   df2= spread(df, key = Stock, value = `Close*`)
   df2 = df2 %>% select(-Open, -High, -Low, -`Adj Close**`, -Volume)
   
-  # Group by Date and summarize to handle repeated dates
+  #Group by Date and summarize to handle repeated dates
   df2 = df2 %>%
     group_by(Date) %>%
     summarise_all(function(x) ifelse(all(is.na(x)), NA, na.omit(x)[1]))
